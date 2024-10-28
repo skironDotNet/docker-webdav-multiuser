@@ -26,18 +26,18 @@ When ran in context of localhost each user has it's location as `http://localhos
 
 If you proxy it with SSL as domain.com then each user has it's location as `https://domain.com/user_name/`
 
-### Extra info
+### Extra info on web content serving
 
 In case you want to host some static web page from the root location like `https://domain.com/`
 
-Modify `src/startup.sh` to remove or comment out this line
+Modify `src/Dockerfile` to remove or comment out this line
 ```
-sed -i '/DocumentRoot "\/usr\/local\/apache2\/htdocs"/,/<\/Directory>/d' /usr/local/apache2/conf/httpd.conf
+RUN sed -i '/DocumentRoot "\/usr\/local\/apache2\/htdocs"/,/<\/Directory>/d' /usr/local/apache2/conf/httpd.conf
 ```
 Rebuild the container via `.build`
 
 In your compose file under `volumes:` section, add: 
 ```
-     - ./some-www:/usr/local/apache2/htdocs
+     - ./www:/usr/local/apache2/htdocs
 ```
-where `some-www` is your folder with static html files and/or images
+where `www` is your folder with static html files and/or images. It works for me without `chown -R www-data:www-data www` but that's probabaly because of 744 mask on the files, so "public" can read. If you can't see the content then run `chown -R www-data:www-data www`
