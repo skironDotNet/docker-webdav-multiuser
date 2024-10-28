@@ -9,6 +9,9 @@ RUN sed -i 's/^#LoadModule dav_module/LoadModule dav_module/' /usr/local/apache2
     sed -i 's/^#LoadModule dav_fs_module/LoadModule dav_fs_module/' /usr/local/apache2/conf/httpd.conf && \
     sed -i 's/^#LoadModule dav_lock_module/LoadModule dav_lock_module/' /usr/local/apache2/conf/httpd.conf
 
+# Remove the default DocumentRoot section in httpd.conf to not host anything from the root location
+RUN sed -i '/DocumentRoot "\/usr\/local\/apache2\/htdocs"/,/<\/Directory>/d' /usr/local/apache2/conf/httpd.conf
+
 # Add RequestHeader directive to httpd.conf to handle SSL reverse proxy issues with WebDAV
 # This lets certain DAV methods work behind an SSL reverse proxy.
 RUN echo "RequestHeader edit Destination ^https http early" >> /usr/local/apache2/conf/httpd.conf

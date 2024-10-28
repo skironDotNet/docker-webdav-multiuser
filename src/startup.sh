@@ -29,9 +29,6 @@ while IFS=: read -r user _; do
     echo "Include $user_conf" >> /usr/local/apache2/conf/httpd.conf
 done < /conf/users.pwd
 
-# Remove the default DocumentRoot section in httpd.conf to not host anything from the root location
-sed -i '/DocumentRoot "\/usr\/local\/apache2\/htdocs"/,/<\/Directory>/d' /usr/local/apache2/conf/httpd.conf
-
 # Start Apache in the foreground
 exec httpd -D FOREGROUND
 
