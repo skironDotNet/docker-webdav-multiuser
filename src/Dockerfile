@@ -9,6 +9,10 @@ RUN sed -i 's/^#LoadModule dav_module/LoadModule dav_module/' /usr/local/apache2
     sed -i 's/^#LoadModule dav_fs_module/LoadModule dav_fs_module/' /usr/local/apache2/conf/httpd.conf && \
     sed -i 's/^#LoadModule dav_lock_module/LoadModule dav_lock_module/' /usr/local/apache2/conf/httpd.conf
 
+# Add RequestHeader directive to httpd.conf to handle SSL reverse proxy issues with WebDAV
+# This lets certain DAV methods work behind an SSL reverse proxy.
+RUN echo "RequestHeader edit Destination ^https http early" >> /usr/local/apache2/conf/httpd.conf
+
 # Add DavLockDB directive to ensure persistence of locks in /users
 RUN echo "DavLockDB /users/DavLock" >> /usr/local/apache2/conf/httpd.conf
 
