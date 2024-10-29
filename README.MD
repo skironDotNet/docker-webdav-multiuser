@@ -13,7 +13,7 @@ Before running the container, you need to define users and their passwords. Each
 
 In compose folder you can see the ready example file, but for the sake of the complete documentation.
 1. Create a file `users.pwd`
-2. From the host run `htpasswd users.pwd user_name`, you'll be asked to enter the password for that user.
+2. From the host run `htpasswd users.pwd userName`, you'll be asked to enter the password for that user.
 3. Mount the file in your docker-compose.yml as
 ```
     volumes:
@@ -22,22 +22,26 @@ In compose folder you can see the ready example file, but for the sake of the co
 ```
 4. Run the container via `docker compose up -d`
 
-When ran in context of localhost each user has it's location as `http://localhost:8080/user_name/`
+Based on declared user names in `users.pwd`, each user will have its own WebDav location as `http://localhost:8080/userName/`
 
-If you proxy it with SSL as domain.com then each user has it's location as `https://domain.com/user_name/`
+If you proxy it with SSL as domain.com then each user will have its own location as `https://domain.com/userName/`
 
-### Extra info on web content serving
+Removing a user from `users.pwd` and restarting the container will remove the access for that user but the data folder will be preserved. The access can be restored back by adding the user back and restarting the container.
 
-In case you want to host some static web page from the root location like `https://domain.com/`
+### Serve static web content in addition to WebDav server 
 
-Modify `src/Dockerfile` to remove or comment out this line
+In case you want to host some static web page from the root location like `https://domain.com/`  
+(the `index.html` will be loaded automatically as default in Apache)
+
+Include env variable in docker-compose.yml
 ```
-RUN sed -i '/DocumentRoot "\/usr\/local\/apache2\/htdocs"/,/<\/Directory>/d' /usr/local/apache2/conf/httpd.conf
+    environment:
+      - EnableWWW=true
 ```
-Rebuild the container via `.build`
+
 
 In your compose file under `volumes:` section, add: 
 ```
-     - ./www:/usr/local/apache2/htdocs
+     - ./www:/www
 ```
 where `www` is your folder with static html files and/or images. It works for me without `chown -R www-data:www-data www` but that's probabaly because of 744 mask on the files, so "public" can read. If you can't see the content then run `chown -R www-data:www-data www`

@@ -12,6 +12,21 @@ if ! grep -q '^[^#]' /conf/users.pwd; then
     exit 1
 fi
 
+# Conditionally remove or update the DocumentRoot section based on EnableWWW environment variable
+if [ "${EnableWWW}" != "true" ]; then
+    echo "Disabling default DocumentRoot in /usr/local/apache2/htdocs"
+    sed -i '/DocumentRoot "\/usr\/local\/apache2\/htdocs"/,/<\/Directory>/d' /usr/local/apache2/conf/httpd.conf
+else
+    # Update DocumentRoot to /www if EnableWWW is set to true
+    echo "Setting DocumentRoot to /www"
+    sed -i 's|DocumentRoot "/usr/local/apache2/htdocs"|DocumentRoot "/www"|' /usr/local/apache2/conf/httpd.conf
+    sed -i 's|<Directory "/usr/local/apache2/htdocs">|<Directory "/www">|' /usr/local/apache2/conf/httpd.conf
+    
+    # Ensure /www directory exists and set correct permissions
+    mkdir -p /www
+    chown www-data:www-data /www
+fi
+
 # Ensure DavLock file exists in the persistent /users directory
 touch /users/DavLock
 chown www-data:www-data /users/DavLock

@@ -2,10 +2,13 @@ services:
   webdav:
     image: webdav-multiuser
     container_name: webdav
+    environment:
+    #  - EnableWWW=true  # Uncomment to enable static files hosting from the root location
     ports:
-      - "8080:80" #adjust for your localport and host only via NPM or Nginx with SSL termination 
+      - "8080:80" #adjust for your local port and host only via NPM or Nginx with SSL termination 
     volumes:
       - ./users.pwd:/conf/users.pwd # Mount the users.pwd file. (You must create an empty file, and add users via `htpasswd users.pwd user_name` from your host before running this container   
       - ./data:/users               # Mount the local `data` directory for user folders
+    #  - ./www:/www      # Uncomment and customize to enable static files hosting from desired location 
     restart: unless-stopped
 
